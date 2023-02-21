@@ -70,7 +70,6 @@ init :: proc(game: ^Game){
     iterator_z :f32= -1
     for i:int=0; i < len(chunks);i+=1{
         chunks[i] = {}
-        chunk_meshes[i] = {}
         chunks[i].position = glm.vec3{iterator_x,0, iterator_z}
         fmt.print(chunks[i].position)
         iterator_z+=1
@@ -78,16 +77,22 @@ init :: proc(game: ^Game){
             iterator_x+=1
             iterator_z = -1
         }
-        
+
+        chunk_meshes[i] = {}
         create_chunk_data(&chunks[i], &chunk_meshes[i], 400)
 
         load_mesh_shaders(&chunk_meshes[i], "resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl")
         load_mesh_vertices(&chunk_meshes[i])
         load_mesh_texture(&chunk_meshes[i], "resources/textures/terrain.png")
         chunk_meshes[i].transform = glm.mat4Translate(chunks[i].position*CHUNK_SIZE)
+        gl.GetUniformLocation(chunk_meshes[i].program, "transform")
+        chunk_meshes[i].transformloc = gl.GetUniformLocation(chunk_meshes[i].program, "transform")
+        chunk_meshes[i].viewloc = gl.GetUniformLocation(chunk_meshes[i].program, "view")
+        chunk_meshes[i].perspectiveloc = gl.GetUniformLocation(chunk_meshes[i].program, "perspective")
     }
     perspective = glm.mat4Perspective(glm.radians_f32(70), 800/600, 0.1, 1000.0)
     lastFrame = glfw.GetTime()
+    
 }
 
 
@@ -113,12 +118,13 @@ draw :: proc(game: ^Game){
     glfw.PollEvents()
         gl.ClearColor(0.6,0.7,0.9,1.0)
         gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+        
         view := mat4LookAt(vec3{sin_f32(f32(glfw.GetTime())*0.5)*35 + 16, 50, cos_f32(f32(glfw.GetTime())*0.5)*35 + 16} , vec3{16,16,16}, vec3{0.0,1.0,0.0})
         for i:int=0; i < len(chunk_meshes);i+=1{
             gl.UseProgram(chunk_meshes[i].program)
-            gl.UniformMatrix4fv(gl.GetUniformLocation(chunk_meshes[i].program, "transform"), 1, false, &chunk_meshes[i].transform[0,0])
-            gl.UniformMatrix4fv(gl.GetUniformLocation(chunk_meshes[i].program, "view"), 1, false, &view[0,0])
-            gl.UniformMatrix4fv(gl.GetUniformLocation(chunk_meshes[i].program, "perspective"), 1, false, &perspective[0,0])
+            gl.UniformMatrix4fv(chunk_meshes[i].transformloc, 1, false, &chunk_meshes[i].transform[0,0])
+            gl.UniformMatrix4fv(chunk_meshes[i].viewloc, 1, false, &view[0,0])
+            gl.UniformMatrix4fv(chunk_meshes[i].perspectiveloc, 1, false, &perspective[0,0])
             draw_mesh(&chunk_meshes[i])
         }
 

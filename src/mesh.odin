@@ -17,6 +17,9 @@ Mesh ::struct{
     ebo: u32,
     program :u32,
     texture :u32,
+    transformloc :i32,
+    viewloc :i32,
+    perspectiveloc :i32,
 }
 
 
