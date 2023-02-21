@@ -34,7 +34,6 @@ load_mesh_vertices :: proc(mesh : ^Mesh){
         gl.VertexAttribPointer(2, 2, gl.UNSIGNED_BYTE, gl.FALSE, 7*size_of(mesh.data[0]), 5*size_of(mesh.data[0]))
         gl.EnableVertexAttribArray(2)
     gl.BindVertexArray(0)
-    gl.BindBuffer(gl.ARRAY_BUFFER, 0)
 
 }
 
@@ -69,11 +68,8 @@ load_mesh_texture :: proc(mesh: ^Mesh, filename : cstring,){
 }
 
 draw_mesh :: proc(mesh : ^Mesh){
-    gl.UseProgram(mesh.program)
-    gl.ActiveTexture(gl.TEXTURE0)
     gl.BindVertexArray(mesh.vao)
     gl.DrawArrays(gl.TRIANGLES, 0, mesh.vertices)
-    gl.BindVertexArray(0)
 }
 
 delete_mesh :: proc(mesh: ^Mesh){

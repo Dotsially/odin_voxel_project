@@ -14,10 +14,13 @@ Game :: struct{
     window : glfw.WindowHandle,
 }
 
-chunks :[9]Chunk
+chunks : [9]Chunk
+chunk_meshes :[9]Mesh
 
 lastFrame :f64 
 fpsCount :f64= 0
+
+perspective :glm.mat4
 
 game_run :: proc(game : ^Game){
     init(game)
@@ -50,6 +53,9 @@ init_window :: proc(game: ^Game){
     gl.load_up_to(4, 3, glfw.gl_set_proc_address)
     gl.Viewport(0,0, 1280, 720)
     gl.Enable(gl.DEPTH_TEST); 
+    gl.Enable(gl.CULL_FACE);
+    gl.CullFace(gl.BACK)
+    gl.FrontFace(gl.CW);  
 }
 
 
@@ -62,8 +68,9 @@ init :: proc(game: ^Game){
     init_window(game)
     iterator_x :f32= -1
     iterator_z :f32= -1
-    for _, i in chunks{
+    for i:int=0; i < len(chunks);i+=1{
         chunks[i] = {}
+        chunk_meshes[i] = {}
         chunks[i].position = glm.vec3{iterator_x,0, iterator_z}
         fmt.print(chunks[i].position)
         iterator_z+=1
@@ -72,12 +79,14 @@ init :: proc(game: ^Game){
             iterator_z = -1
         }
         
-        create_chunk_data(&chunks[i], 400)
+        create_chunk_data(&chunks[i], &chunk_meshes[i], 400)
 
-        load_mesh_shaders(&chunks[i].mesh, "resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl")
-        load_mesh_vertices(&chunks[i].mesh)
-        load_mesh_texture(&chunks[i].mesh, "resources/textures/terrain.png")
+        load_mesh_shaders(&chunk_meshes[i], "resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl")
+        load_mesh_vertices(&chunk_meshes[i])
+        load_mesh_texture(&chunk_meshes[i], "resources/textures/terrain.png")
+        chunk_meshes[i].transform = glm.mat4Translate(chunks[i].position*CHUNK_SIZE)
     }
+    perspective = glm.mat4Perspective(glm.radians_f32(70), 800/600, 0.1, 1000.0)
     lastFrame = glfw.GetTime()
 }
 
@@ -93,6 +102,39 @@ game_loop :: proc(game: ^Game){
 
 update :: proc(){
     using glm
+    get_fps()
+    
+    
+    
+}
+
+draw :: proc(game: ^Game){
+    using glm
+    glfw.PollEvents()
+        gl.ClearColor(0.6,0.7,0.9,1.0)
+        gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+        view := mat4LookAt(vec3{sin_f32(f32(glfw.GetTime())*0.5)*35 + 16, 50, cos_f32(f32(glfw.GetTime())*0.5)*35 + 16} , vec3{16,16,16}, vec3{0.0,1.0,0.0})
+        for i:int=0; i < len(chunk_meshes);i+=1{
+            gl.UseProgram(chunk_meshes[i].program)
+            gl.UniformMatrix4fv(gl.GetUniformLocation(chunk_meshes[i].program, "transform"), 1, false, &chunk_meshes[i].transform[0,0])
+            gl.UniformMatrix4fv(gl.GetUniformLocation(chunk_meshes[i].program, "view"), 1, false, &view[0,0])
+            gl.UniformMatrix4fv(gl.GetUniformLocation(chunk_meshes[i].program, "perspective"), 1, false, &perspective[0,0])
+            draw_mesh(&chunk_meshes[i])
+        }
+
+    glfw.SwapBuffers(game.window)
+}
+
+
+close :: proc(game : ^Game){
+    for _, i in chunk_meshes{
+        delete_mesh(&chunk_meshes[i])
+    }
+    glfw.DestroyWindow(game.window)
+    glfw.Terminate()
+}
+
+get_fps :: proc(){
     currentFrame := glfw.GetTime()
     delta := currentFrame - lastFrame
     fpsCount += 1
@@ -101,37 +143,6 @@ update :: proc(){
         fpsCount = 0
         lastFrame = currentFrame
     }
-    view := mat4LookAt(vec3{sin_f32(f32(glfw.GetTime()*0.5))*35 + 16, 50, cos_f32(f32(glfw.GetTime()*0.5))*35 + 16} , vec3{16,16,16}, vec3{0.0,1.0,0.0})
-    perspective := mat4Perspective(radians_f32(70), 800/600, 0.1, 1000.0)
-    
-    for _, i in chunks{
-        gl.UseProgram(chunks[i].mesh.program)
-        chunks[i].mesh.transform = glm.mat4Translate(chunks[i].position*CHUNK_SIZE)
-        gl.UniformMatrix4fv(gl.GetUniformLocation(chunks[i].mesh.program, "transform"), 1, false, &chunks[i].mesh.transform[0,0])
-        gl.UniformMatrix4fv(gl.GetUniformLocation(chunks[i].mesh.program, "view"), 1, false, &view[0,0])
-        gl.UniformMatrix4fv(gl.GetUniformLocation(chunks[i].mesh.program, "perspective"), 1, false, &perspective[0,0])
-    }
-}
-
-draw :: proc(game: ^Game){
-    glfw.PollEvents()
-        gl.ClearColor(0.6,0.7,0.9,1.0)
-        gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        
-        for _, i in chunks{
-            draw_mesh(&chunks[i].mesh)
-        }
-
-    glfw.SwapBuffers(game.window)
-}
-
-
-close :: proc(game : ^Game){
-    for _, i in chunks{
-        delete_mesh(&chunks[i].mesh)
-    }
-    glfw.DestroyWindow(game.window)
-    glfw.Terminate()
 }
 
 

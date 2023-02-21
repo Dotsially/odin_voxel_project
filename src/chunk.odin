@@ -11,14 +11,13 @@ DIRT:: vec2{2,15}
 CHUNK_SIZE :: 32
 
 Chunk::struct{
-    mesh : Mesh,
     height : [32][32]u8,
     density: [32][32][32]u8,
     position : glm.vec3,
 }
 
 
-create_chunk_data :: proc(chunk :^Chunk, seed: i64){
+create_chunk_data :: proc(chunk :^Chunk, chunks_mesh : ^Mesh, seed: i64){
     for x:u8= 0; x < CHUNK_SIZE; x+=1{
         for y:u8= 0; y < CHUNK_SIZE; y+=1{
             for z:u8= 0; z < CHUNK_SIZE; z+=1{
@@ -38,14 +37,14 @@ create_chunk_data :: proc(chunk :^Chunk, seed: i64){
                             cube = create_cube_mesh(x,y,z,GRASS)
                     }
                     for _,i in cube{
-                        append(&chunk.mesh.data, cube[i])
+                        append(&chunks_mesh.data, cube[i])
                     }
-                    chunk.mesh.vertices+=108
+                    chunks_mesh.vertices+=108
                 }
             }
         }
     }
-    fmt.println(len(chunk.mesh.data))
+    fmt.println(len(chunks_mesh.data))
 }
 
 create_cube_mesh :: proc(x,y,z: u8, index:vec2 ) -> [252]u8{
