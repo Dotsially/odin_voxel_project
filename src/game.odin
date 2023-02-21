@@ -16,6 +16,9 @@ Game :: struct{
 
 chunks :[9]Chunk
 
+lastFrame :f64 
+fpsCount :f64= 0
+
 game_run :: proc(game : ^Game){
     init(game)
     game_loop(game)
@@ -75,6 +78,7 @@ init :: proc(game: ^Game){
         load_mesh_vertices(&chunks[i].mesh)
         load_mesh_texture(&chunks[i].mesh, "resources/textures/terrain.png")
     }
+    lastFrame = glfw.GetTime()
 }
 
 
@@ -89,6 +93,14 @@ game_loop :: proc(game: ^Game){
 
 update :: proc(){
     using glm
+    currentFrame := glfw.GetTime()
+    delta := currentFrame - lastFrame
+    fpsCount += 1
+    if(delta >= 1.0){
+        fmt.println(fpsCount/delta)
+        fpsCount = 0
+        lastFrame = currentFrame
+    }
     view := mat4LookAt(vec3{sin_f32(f32(glfw.GetTime()*0.5))*35 + 16, 50, cos_f32(f32(glfw.GetTime()*0.5))*35 + 16} , vec3{16,16,16}, vec3{0.0,1.0,0.0})
     perspective := mat4Perspective(radians_f32(70), 800/600, 0.1, 1000.0)
     
