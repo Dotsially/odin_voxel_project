@@ -7,8 +7,8 @@ import gl "vendor:OpenGL"
 import stbi "vendor:stb/image"
 import "vendor:glfw"
 
-SCREEN_WIDTH  :: 1280
-SCREEN_HEIGHT :: 720
+SCREEN_WIDTH  :: 1920  
+SCREEN_HEIGHT :: 1080
 
 Game :: struct{
     window : glfw.WindowHandle,
@@ -54,7 +54,7 @@ init_window :: proc(game: ^Game){
     glfw.MakeContextCurrent(game.window)
     glfw.SetKeyCallback(game.window, key_callback)
     gl.load_up_to(4, 3, glfw.gl_set_proc_address)
-    gl.Viewport(0,0, 1280, 720)
+    gl.Viewport(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)
     gl.Enable(gl.DEPTH_TEST); 
     //gl.Enable(gl.CULL_FACE);
     gl.Enable(gl.MULTISAMPLE)
