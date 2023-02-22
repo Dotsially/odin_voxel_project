@@ -10,11 +10,10 @@ import "vendor:OpenGL"
 //specifically made for cubes
 Mesh ::struct{
     data : [dynamic]u8,
-    vertices :i32,
     transform : glm.mat4x4,
     vao: u32,
     vbo: u32,
-    program :u32,
+    vertices: i32,
 }
 
 
@@ -35,13 +34,13 @@ load_mesh_vertices :: proc(mesh : ^Mesh){
 
 }
 
-load_mesh_shaders :: proc(mesh: ^Mesh, vertex_path, fragment_path : string){
-    program, program_ok := gl.load_shaders_file(vertex_path, fragment_path)
+load_mesh_shaders :: proc(program : ^u32, vertex_path, fragment_path : string){
+    temp_program, program_ok := gl.load_shaders_file(vertex_path, fragment_path)
     if !program_ok{
         fmt.println("shader error")
     }
     
-    mesh.program = program
+    program^ = temp_program
 }
 
 load_mesh_texture :: proc(texture : ^u32, filename : cstring,){
@@ -57,7 +56,7 @@ load_mesh_texture :: proc(texture : ^u32, filename : cstring,){
 
     gl.GenTextures(1, texture)
     gl.BindTexture(gl.TEXTURE_2D, texture^)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
     gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, image)
     gl.GenerateMipmap(gl.TEXTURE_2D)
@@ -72,5 +71,4 @@ draw_mesh :: proc(mesh : ^Mesh){
 delete_mesh :: proc(mesh: ^Mesh){
     gl.DeleteVertexArrays(1, &mesh.vao)
     gl.DeleteBuffers(1, &mesh.vbo)
-    gl.DeleteProgram(mesh.program)
 }

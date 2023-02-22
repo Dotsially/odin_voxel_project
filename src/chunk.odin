@@ -39,7 +39,7 @@ create_chunk_data :: proc(chunk :^Chunk, chunk_mesh : ^Mesh, seed: i64){
                     for _,i in cube{
                         append(&chunk_mesh.data, cube[i])
                     }
-                    chunk_mesh.vertices+=108
+                    chunk_mesh.vertices+=36
                 }
             }
         }
