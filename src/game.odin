@@ -18,9 +18,10 @@ chunks : [9]Chunk
 chunk_meshes :[9]Mesh
 
 lastFrame :f64 
-fpsCount :f64= 0
+fpsCount :f64 = 0
 
-perspective :glm.mat4
+perspective : glm.mat4
+texture : u32
 
 game_run :: proc(game : ^Game){
     init(game)
@@ -53,7 +54,7 @@ init_window :: proc(game: ^Game){
     gl.load_up_to(4, 3, glfw.gl_set_proc_address)
     gl.Viewport(0,0, 1280, 720)
     gl.Enable(gl.DEPTH_TEST); 
-    gl.Enable(gl.CULL_FACE);
+    //gl.Enable(gl.CULL_FACE);
     gl.CullFace(gl.BACK)
     gl.FrontFace(gl.CW);  
 }
@@ -66,6 +67,8 @@ key_callback :: proc "c" (window: glfw.WindowHandle, key, scancode, action, mods
 
 init :: proc(game: ^Game){
     init_window(game)
+    
+    load_mesh_texture(&texture, "resources/textures/terrain.png")
     iterator_x :f32= -1
     iterator_z :f32= -1
     for i:int=0; i < len(chunks);i+=1{
@@ -83,12 +86,9 @@ init :: proc(game: ^Game){
 
         load_mesh_shaders(&chunk_meshes[i], "resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl")
         load_mesh_vertices(&chunk_meshes[i])
-        load_mesh_texture(&chunk_meshes[i], "resources/textures/terrain.png")
         chunk_meshes[i].transform = glm.mat4Translate(chunks[i].position*CHUNK_SIZE)
-        gl.GetUniformLocation(chunk_meshes[i].program, "transform")
-        chunk_meshes[i].transformloc = gl.GetUniformLocation(chunk_meshes[i].program, "transform")
-        chunk_meshes[i].viewloc = gl.GetUniformLocation(chunk_meshes[i].program, "view")
-        chunk_meshes[i].perspectiveloc = gl.GetUniformLocation(chunk_meshes[i].program, "perspective")
+        gl.Uniform1i(gl.GetUniformLocation(chunk_meshes[i].program, "thisTexture"),0)
+
     }
     perspective = glm.mat4Perspective(glm.radians_f32(70), 800/600, 0.1, 1000.0)
     lastFrame = glfw.GetTime()
@@ -100,14 +100,21 @@ init :: proc(game: ^Game){
 game_loop :: proc(game: ^Game){
     for !glfw.WindowShouldClose(game.window){
         update()
-        draw(game)
+        currentFrame := glfw.GetTime()
+        delta := currentFrame - lastFrame
+        fpsCount += 1
+        if delta >= 1.0 / 60{
+            fpsCount = 0
+            lastFrame = currentFrame
+            draw(game)
+    }
+        
     }
 }
 
 
 update :: proc(){
     using glm
-    get_fps()
     
     
     
@@ -122,9 +129,9 @@ draw :: proc(game: ^Game){
         view := mat4LookAt(vec3{sin_f32(f32(glfw.GetTime())*0.5)*35 + 16, 50, cos_f32(f32(glfw.GetTime())*0.5)*35 + 16} , vec3{16,16,16}, vec3{0.0,1.0,0.0})
         for i:int=0; i < len(chunk_meshes);i+=1{
             gl.UseProgram(chunk_meshes[i].program)
-            gl.UniformMatrix4fv(chunk_meshes[i].transformloc, 1, false, &chunk_meshes[i].transform[0,0])
-            gl.UniformMatrix4fv(chunk_meshes[i].viewloc, 1, false, &view[0,0])
-            gl.UniformMatrix4fv(chunk_meshes[i].perspectiveloc, 1, false, &perspective[0,0])
+            gl.UniformMatrix4fv(0, 1, false, &chunk_meshes[i].transform[0,0])
+            gl.UniformMatrix4fv(1, 1, false, &view[0,0])
+            gl.UniformMatrix4fv(2, 1, false, &perspective[0,0])
             draw_mesh(&chunk_meshes[i])
         }
 
@@ -139,16 +146,4 @@ close :: proc(game : ^Game){
     glfw.DestroyWindow(game.window)
     glfw.Terminate()
 }
-
-get_fps :: proc(){
-    currentFrame := glfw.GetTime()
-    delta := currentFrame - lastFrame
-    fpsCount += 1
-    if(delta >= 1.0){
-        fmt.println(fpsCount/delta)
-        fpsCount = 0
-        lastFrame = currentFrame
-    }
-}
-
 

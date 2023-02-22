@@ -14,12 +14,7 @@ Mesh ::struct{
     transform : glm.mat4x4,
     vao: u32,
     vbo: u32,
-    ebo: u32,
     program :u32,
-    texture :u32,
-    transformloc :i32,
-    viewloc :i32,
-    perspectiveloc :i32,
 }
 
 
@@ -49,7 +44,7 @@ load_mesh_shaders :: proc(mesh: ^Mesh, vertex_path, fragment_path : string){
     mesh.program = program
 }
 
-load_mesh_texture :: proc(mesh: ^Mesh, filename : cstring,){
+load_mesh_texture :: proc(texture : ^u32, filename : cstring,){
     width, height, nrChannels : c.int
 
     stbi.set_flip_vertically_on_load(1)
@@ -60,14 +55,13 @@ load_mesh_texture :: proc(mesh: ^Mesh, filename : cstring,){
 
     defer stbi.image_free(image)
 
-    gl.GenTextures(1, &mesh.texture)
-    gl.BindTexture(gl.TEXTURE_2D, mesh.texture)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+    gl.GenTextures(1, texture)
+    gl.BindTexture(gl.TEXTURE_2D, texture^)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
     gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, image)
     gl.GenerateMipmap(gl.TEXTURE_2D)
- 
-    gl.Uniform1i(gl.GetUniformLocation(mesh.program, "thisTexture"),0)
+
 }
 
 draw_mesh :: proc(mesh : ^Mesh){

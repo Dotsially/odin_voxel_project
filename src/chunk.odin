@@ -17,7 +17,7 @@ Chunk::struct{
 }
 
 
-create_chunk_data :: proc(chunk :^Chunk, chunks_mesh : ^Mesh, seed: i64){
+create_chunk_data :: proc(chunk :^Chunk, chunk_mesh : ^Mesh, seed: i64){
     for x:u8= 0; x < CHUNK_SIZE; x+=1{
         for y:u8= 0; y < CHUNK_SIZE; y+=1{
             for z:u8= 0; z < CHUNK_SIZE; z+=1{
@@ -37,14 +37,16 @@ create_chunk_data :: proc(chunk :^Chunk, chunks_mesh : ^Mesh, seed: i64){
                             cube = create_cube_mesh(x,y,z,GRASS)
                     }
                     for _,i in cube{
-                        append(&chunks_mesh.data, cube[i])
+                        append(&chunk_mesh.data, cube[i])
                     }
-                    chunks_mesh.vertices+=108
+                    chunk_mesh.vertices+=108
                 }
             }
         }
     }
-    fmt.println(len(chunks_mesh.data))
+    fmt.print("verts :", chunk_mesh.vertices)
+    fmt.print(" tris :", chunk_mesh.vertices/12)
+    fmt.println(" bytes :", len(chunk_mesh.data))
 }
 
 create_cube_mesh :: proc(x,y,z: u8, index:vec2 ) -> [252]u8{
