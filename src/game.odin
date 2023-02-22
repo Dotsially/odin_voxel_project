@@ -35,7 +35,7 @@ game_run :: proc(game : ^Game){
 init_window :: proc(game: ^Game){
     glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
     glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 3)
-    //glfw.WindowHint(glfw.SAMPLES, 4);
+    glfw.WindowHint(glfw.SAMPLES, 4);
     
     if glfw.Init() != 1{
         fmt.println("Failed to init glfw")
@@ -57,7 +57,7 @@ init_window :: proc(game: ^Game){
     gl.Viewport(0,0, 1280, 720)
     gl.Enable(gl.DEPTH_TEST); 
     //gl.Enable(gl.CULL_FACE);
-    //gl.Enable(gl.MULTISAMPLE)
+    gl.Enable(gl.MULTISAMPLE)
     gl.CullFace(gl.BACK)
     gl.FrontFace(gl.CW);  
 }
