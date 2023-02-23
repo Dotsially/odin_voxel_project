@@ -89,7 +89,7 @@ init :: proc(window : ^glfw.WindowHandle){
     camera = Camera{
         position = glm.vec3{0.0,32.0,0.0},
         target = glm.vec3{0.0,0.0,-1.0},
-        up = glm.vec3{0.0,1.0,0.0},
+        world_up = glm.vec3{0.0,1.0,0.0},
         fov = 70,
         yaw = -90,
     }
@@ -114,7 +114,7 @@ init :: proc(window : ^glfw.WindowHandle){
         chunk_meshes[i].transform = glm.mat4Translate(chunks[i].position*CHUNK_SIZE)
 
     }
-    perspective = glm.mat4Perspective(glm.radians_f32(camera.fov), 800/600, 0.1, 1000.0)
+    perspective = glm.mat4Perspective(glm.radians_f32(camera.fov), f32(SCREEN_WIDTH)/f32(SCREEN_HEIGHT), 0.1, 1000.0)
     last_frame = glfw.GetTime()
     
 }
@@ -141,19 +141,20 @@ game_loop :: proc(window : glfw.WindowHandle){
 
 
 update :: proc(delta_time :f64, window : glfw.WindowHandle){
-    using glm
+    using glm 
+
     view = mat4LookAt(camera.position, camera.position + camera.target, camera.up) 
     if glfw.GetKey(window, glfw.KEY_W) == glfw.PRESS{
-        camera.position += 5 * f32(delta_time) * camera.move_direction
+        camera.position += 20 * f32(delta_time) * camera.move_direction
     } 
     if glfw.GetKey(window, glfw.KEY_S) == glfw.PRESS{
-        camera.position -= 5 * f32(delta_time) * camera.move_direction
+        camera.position -= 20 * f32(delta_time) * camera.move_direction
     } 
     if glfw.GetKey(window, glfw.KEY_A) == glfw.PRESS{
-        camera.position += 5 * f32(delta_time)  * glm.normalize_vec3(glm.cross_vec3(camera.up, camera.target))
+        camera.position -= 20 * f32(delta_time)  * camera.right
     } 
     if glfw.GetKey(window, glfw.KEY_D) == glfw.PRESS{
-        camera.position -= 5 * f32(delta_time) * glm.normalize_vec3(glm.cross_vec3(camera.up, camera.target))
+        camera.position += 20 * f32(delta_time) * camera.right
     } 
     if(glfw.GetKey(window, glfw.KEY_ESCAPE)) == glfw.PRESS{
         glfw.SetWindowShouldClose(window, true)
@@ -225,5 +226,7 @@ mouse_callback :: proc "c" (window : glfw.WindowHandle, xpos_in : f64, ypos_in :
     direction.y = glm.sin_f32(glm.radians_f32(camera.pitch))
     direction.z  = glm.sin_f32(glm.radians_f32(camera.yaw)) * glm.cos_f32(glm.radians_f32(camera.pitch))
     camera.target = glm.normalize_vec3(direction)
+    camera.right = glm.normalize_vec3(glm.cross_vec3(camera.target, camera.world_up))
+    camera.up = glm.normalize_vec3(glm.cross_vec3(camera.right, camera.target))
     camera.move_direction = glm.normalize_vec3(glm.vec3{glm.cos_f32(glm.radians_f32(camera.yaw)), 0.0, glm.sin_f32(glm.radians_f32(camera.yaw))})   
 }
