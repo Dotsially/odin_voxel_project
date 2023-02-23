@@ -26,7 +26,7 @@ create_chunk_data :: proc(chunk :^Chunk, chunk_mesh : ^Mesh, seed: i64){
                 chunk_x :f64 = f64(chunk.position.x * CHUNK_SIZE) + f64(x) 
                 chunk_y :f64 = f64(chunk.position.y * CHUNK_SIZE) + f64(y)
                 chunk_z :f64 = f64(chunk.position.z * CHUNK_SIZE) + f64(z) 
-                chunk.height = u8((math.noise_2d(seed, math.Vec2{chunk_x*0.1,chunk_z*0.1}) + 1.1) * 16)
+                chunk.height = u8((math.noise_2d(seed, math.Vec2{chunk_x*0.1,chunk_z*0.1}) + 1.1) * 15.5)
                 //chunk.density[x][y][z] = math.noise_3d_improve_xz(seed, math.Vec3{f64(chunk_x)*0.05,f64(chunk_y)*0.05, f64(chunk_z)*0.05}) * 128 < 50 ? 1:0
                 if y < chunk.height[x][y]{
                     cube :[252]u8
