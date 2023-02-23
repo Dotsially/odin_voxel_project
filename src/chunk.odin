@@ -4,10 +4,12 @@ import glm "core:math/linalg/glsl"
 import math "core:math/noise"
 import "core:fmt"
 
+@(private = "file")
 vec2 :: [2]u8
 STONE:: vec2{0,14}
 GRASS:: vec2{0,15}
 DIRT:: vec2{2,15}
+
 CHUNK_SIZE :: 32
 
 Chunk::struct{
