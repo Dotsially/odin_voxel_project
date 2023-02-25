@@ -21,8 +21,8 @@ MouseInput :: struct{
 }
 
 //using variables
-chunks : [9]Chunk
-chunk_meshes :[9]Mesh
+chunks : [25]Chunk
+chunk_meshes :[25]Mesh
 
 
 last_frame :f64 
@@ -35,6 +35,7 @@ view : glm.mat4
 
 camera : Camera
 
+fps_count : f64
 
 mouse_input := MouseInput{}
 
@@ -96,27 +97,33 @@ init :: proc(window : ^glfw.WindowHandle){
     load_mesh_texture(&texture, "resources/textures/terrain.png")
     load_mesh_shaders(&program, "resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl")
     gl.Uniform1i(gl.GetUniformLocation(program, "thisTexture"),0)
-    iterator_x :f32= -1
-    iterator_z :f32= -1
+
+    iterator_x :f32= -2
+    iterator_z :f32= -2
+    
     for i:int=0; i < len(chunks);i+=1{
         chunks[i] = {}
         chunks[i].position = glm.vec3{iterator_x,0, iterator_z}
         fmt.print(chunks[i].position)
         iterator_z+=1
-        if iterator_z>1{
+        if iterator_z>2{
             iterator_x+=1
-            iterator_z = -1
+            iterator_z = -2
         }
+    }
 
+    for i:int=0; i < len(chunk_meshes);i+=1{
         chunk_meshes[i] = {}
-        create_chunk_data(&chunks[i], &chunk_meshes[i], 400)
+        create_chunk_data(&chunks[i], &chunk_meshes[i], 5)
         load_mesh_vertices(&chunk_meshes[i])
         chunk_meshes[i].transform = glm.mat4Translate(chunks[i].position*CHUNK_SIZE)
 
     }
+
+
     perspective = glm.mat4Perspective(glm.radians_f32(camera.fov), f32(SCREEN_WIDTH)/f32(SCREEN_HEIGHT), 0.1, 1000.0)
+
     last_frame = glfw.GetTime()
-    
 }
 
 
@@ -125,9 +132,11 @@ game_loop :: proc(window : glfw.WindowHandle){
     for !glfw.WindowShouldClose(window){
         current_frame := glfw.GetTime()
         delta_time := current_frame - last_frame
-
+        fps_count += 1
         
         if delta_time >= 1.0/1000{
+            //fmt.println(fps_count/delta_time)
+            fps_count = 0
             last_frame = current_frame
             update(delta_time, window)
             draw(window)

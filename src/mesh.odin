@@ -24,12 +24,14 @@ load_mesh_vertices :: proc(mesh : ^Mesh){
     gl.BindVertexArray(mesh.vao)
         gl.BindBuffer(gl.ARRAY_BUFFER, mesh.vbo)
         gl.BufferData(gl.ARRAY_BUFFER, size_of(mesh.data[0]) * len(mesh.data), raw_data(mesh.data), gl.STATIC_DRAW)
-        gl.VertexAttribPointer(0, 3, gl.UNSIGNED_BYTE, gl.FALSE, 7*size_of(mesh.data[0]), 0)
+        gl.VertexAttribPointer(0, 3, gl.UNSIGNED_BYTE, gl.FALSE, 8*size_of(mesh.data[0]), 0)
         gl.EnableVertexAttribArray(0)
-        gl.VertexAttribPointer(1, 2, gl.UNSIGNED_BYTE, gl.FALSE, 7*size_of(mesh.data[0]), 3*size_of(mesh.data[0]))
+        gl.VertexAttribPointer(1, 2, gl.UNSIGNED_BYTE, gl.FALSE, 8*size_of(mesh.data[0]), 3*size_of(mesh.data[0]))
         gl.EnableVertexAttribArray(1)
-        gl.VertexAttribPointer(2, 2, gl.UNSIGNED_BYTE, gl.FALSE, 7*size_of(mesh.data[0]), 5*size_of(mesh.data[0]))
+        gl.VertexAttribPointer(2, 2, gl.UNSIGNED_BYTE, gl.FALSE, 8*size_of(mesh.data[0]), 5*size_of(mesh.data[0]))
         gl.EnableVertexAttribArray(2)
+        gl.VertexAttribPointer(3, 1, gl.UNSIGNED_BYTE, gl.FALSE, 8*size_of(mesh.data[0]), 7*size_of(mesh.data[0]))
+        gl.EnableVertexAttribArray(3)
     gl.BindVertexArray(0)
 
 }
