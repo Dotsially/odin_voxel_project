@@ -6,6 +6,14 @@ import "core:fmt"
 
 @(private = "file")
 vec2 :: [2]u8
+
+Chunk::struct{
+    height : [34][66]u8,
+    density: [34][66][34]u8,
+    world: [34][66][34]u8,
+    position : glm.vec3,
+}
+
 blocks := [4]vec2{
     vec2{0,0},
     vec2{0,15},
@@ -14,24 +22,16 @@ blocks := [4]vec2{
 }
 
 CHUNK_SIZE :: 32
-
-
-
-Chunk::struct{
-    height : [32][64]u8,
-    density: [32][64][32]u8,
-    world: [32][64][32]u8,
-    position : glm.vec3,
-}
+CHUNK_DATA_SIZE :: 34
 
 face :[48]u8
 
 
 
 create_chunk_data :: proc(chunk : ^Chunk, seed: i64){
-    for x:u8= 0; x < CHUNK_SIZE; x+=1{
-        for y:u8= 0; y < 64; y+=1{
-            for z:u8= 0; z < CHUNK_SIZE; z+=1{
+    for x:u8= 0; x < CHUNK_DATA_SIZE; x+=1{
+        for y:u8= 0; y < 66; y+=1{
+            for z:u8= 0; z < CHUNK_DATA_SIZE; z+=1{
                 //noise offset
                 chunk_x_offset :f64 = f64(chunk.position.x * CHUNK_SIZE) + f64(x) 
                 chunk_y_offset :f64 = f64(chunk.position.y * CHUNK_SIZE) + f64(y)
@@ -51,7 +51,7 @@ create_chunk_data :: proc(chunk : ^Chunk, seed: i64){
                             chunk.world[x][y][z] = 3
                         case y <= chunk.height[x][y] && chunk.density[x][y][z] == 0:
                             chunk.world[x][y][z] = 1
-                        case y == 0 :   
+                        case y == 1 :   
                             chunk.world[x][y][z] = 2
                         case:
                             chunk.world[x][y][z] = 0
@@ -64,10 +64,9 @@ create_chunk_data :: proc(chunk : ^Chunk, seed: i64){
 
 
 create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
-    for x:u8= 0; x < CHUNK_SIZE; x+=1{
-        for y:u8= 0; y < 64; y+=1{
-            for z:u8= 0; z < CHUNK_SIZE; z+=1{
-                if(z >= 1 && z < 31 && y >= 1 && y < 63 && x >= 1 && x < 31){
+    for x:u8= 1; x <= CHUNK_SIZE; x+=1{
+        for y:u8= 1; y <= 64; y+=1{
+            for z:u8= 1; z <= CHUNK_SIZE; z+=1{
                     if(chunk.world[x][y][z]!= 0){
                     //front
                     if chunk.world[x][y][z-1] == 0{
@@ -127,7 +126,6 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                         
                         chunk_mesh.vertices+=24   
                     }
-                }
             }
             }
         }

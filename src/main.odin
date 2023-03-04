@@ -1,8 +1,8 @@
 package main
 
-import "core:fmt"
 
 main :: proc() {
-    game := Game{}
-    game_run(&game)
+    init()
+    game_loop()
+    close()
 }

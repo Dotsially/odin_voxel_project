@@ -8,7 +8,9 @@ out vec4 FragColor;
 uniform sampler2D thisTexture;
 
 void main(){
+    float depth = gl_FragCoord.z * 2.0 - 1.0;
+    depth = (2.0*1.0*100.0)/(100.0 + 1.0 - depth * (100.0- 1.0))/100.0;
     vec2 offsetTexCoords = vec2(fTexCoords.x + fBlockID.x, fTexCoords.y + fBlockID.y);
     vec2 scaledTexCoords = vec2(offsetTexCoords.x*0.0625, offsetTexCoords.y*0.0625);
-    FragColor = fNormals * texture(thisTexture, vec2(scaledTexCoords.x-fBlockID.x, scaledTexCoords.y -fBlockID.y));
+    FragColor = mix(fNormals * texture(thisTexture, vec2(scaledTexCoords.x-fBlockID.x, scaledTexCoords.y -fBlockID.y)), vec4(0.6,0.7,0.9,1.0), depth);
 }
