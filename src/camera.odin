@@ -23,7 +23,7 @@ camera_init :: proc (camera : ^Camera){
     camera.world_up = glm.vec3{0.0,1.0,0.0}
     camera.right = glm.normalize_vec3(glm.cross_vec3(camera.target, camera.world_up))
     camera.up = glm.normalize_vec3(glm.cross_vec3(camera.right, camera.target))
-    camera.fov = 70
+    camera.fov = glm.radians_f32(80)
     camera.yaw = -90
     camera.move_direction = glm.normalize_vec3(glm.vec3{glm.cos_f32(glm.radians_f32(camera.yaw)), 0.0, glm.sin_f32(glm.radians_f32(camera.yaw))})
 }

@@ -31,41 +31,6 @@ program : u32
 mouse_input := MouseInput{}
 
 
-//Inits glfw and glfw window. 
-//TODO: Add callbacks for input and screen resize.
-init_window :: proc(window : ^glfw.WindowHandle){
-    glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
-    glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 3)
-    glfw.WindowHint(glfw.SAMPLES, 4);
-    
-    if glfw.Init() != 1{
-        fmt.println("Failed to init glfw")
-        return
-    }
-
-
-    window^ = glfw.CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", nil,nil)
-
-    if window^ == nil{
-        fmt.println("Failed to create window")
-        return
-    }
-
-
-    glfw.MakeContextCurrent(window^)
-    glfw.SetInputMode(window^, glfw.CURSOR, glfw.CURSOR_DISABLED)
-    glfw.SetCursorPosCallback(window^, mouse_callback);
-
-    gl.load_up_to(4, 3, glfw.gl_set_proc_address)
-    gl.Viewport(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)
-    gl.Enable(gl.DEPTH_TEST); 
-    gl.Enable(gl.CULL_FACE);
-    gl.Enable(gl.MULTISAMPLE)
-    gl.CullFace(gl.BACK)
-    gl.FrontFace(gl.CW);  
-}
-
-
 
 init :: proc(){
     init_window(&window)
@@ -104,6 +69,39 @@ init :: proc(){
     perspective = glm.mat4Perspective(camera.fov,f32(SCREEN_WIDTH)/f32(SCREEN_HEIGHT), 0.1, 1000.0)
 }
 
+//Inits glfw and glfw window. 
+//TODO: Add callbacks for input and screen resize.
+init_window :: proc(window : ^glfw.WindowHandle){
+    glfw.WindowHint(glfw.CONTEXT_VERSION_MAJOR, 4)
+    glfw.WindowHint(glfw.CONTEXT_VERSION_MINOR, 3)
+    glfw.WindowHint(glfw.SAMPLES, 4);
+    
+    if glfw.Init() != 1{
+        fmt.println("Failed to init glfw")
+        return
+    }
+
+
+    window^ = glfw.CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", nil,nil)
+
+    if window^ == nil{
+        fmt.println("Failed to create window")
+        return
+    }
+
+
+    glfw.MakeContextCurrent(window^)
+    glfw.SetInputMode(window^, glfw.CURSOR, glfw.CURSOR_DISABLED)
+    glfw.SetCursorPosCallback(window^, mouse_callback);
+
+    gl.load_up_to(4, 3, glfw.gl_set_proc_address)
+    gl.Viewport(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)
+    gl.Enable(gl.DEPTH_TEST); 
+    gl.Enable(gl.CULL_FACE);
+    gl.Enable(gl.MULTISAMPLE)
+    gl.CullFace(gl.BACK)
+    gl.FrontFace(gl.CW);  
+}
 
 
 game_loop :: proc(){
@@ -152,6 +150,7 @@ draw :: proc(window : glfw.WindowHandle){
     glfw.SwapBuffers(window)
 }
 
+
 close :: proc(){
     gl.DeleteProgram(program)
     for _, i in chunk_meshes{
@@ -160,6 +159,17 @@ close :: proc(){
     glfw.DestroyWindow(window)
     glfw.Terminate()
 }
+
+
+
+
+
+
+
+
+
+
+
 
 mouse_callback :: proc "c" (window : glfw.WindowHandle, xpos_in : f64, ypos_in : f64){
     camera_mouse_callback_first_person(&camera, &mouse_input, xpos_in, ypos_in)   

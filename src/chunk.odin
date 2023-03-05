@@ -42,7 +42,7 @@ create_chunk_data :: proc(chunk : ^Chunk, seed: i64){
                 
                 //caves
                 chunk.density[x][y][z] = u8(((math.noise_3d_improve_xz(seed, 
-                    math.Vec3{chunk_x_offset*0.01,chunk_y_offset*0.01, chunk_z_offset*0.01}) + 1.1) * 32)) > chunk.height[x][y] + y/2 - 5 ? 1:0 
+                    math.Vec3{chunk_x_offset*0.05,chunk_y_offset*0.05, chunk_z_offset*0.05}) + 1.1) * 32)) > chunk.height[x][y] + y/2 - 5 ? 1:0 
                 
                 switch{
                         case y < chunk.height[x][y] - 5 && chunk.density[x][y][z] == 0:
@@ -117,7 +117,7 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                         
                         chunk_mesh.vertices+=24   
                     }
-                    if chunk.world[x][y-1][z] == 0{
+                    if chunk.world[x][y-1][z] == 0 && y != 1{
                         face = create_face_mesh(x,y,z, blocks[chunk.world[x][y][z]], 5)
                     
                         for _,i in face{
