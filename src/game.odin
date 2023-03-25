@@ -92,15 +92,15 @@ init_window :: proc(window : ^glfw.WindowHandle){
 
     glfw.MakeContextCurrent(window^)
     glfw.SetInputMode(window^, glfw.CURSOR, glfw.CURSOR_DISABLED)
-    glfw.SetCursorPosCallback(window^, mouse_callback);
+    glfw.SetCursorPosCallback(window^, mouse_callback)
 
     gl.load_up_to(4, 3, glfw.gl_set_proc_address)
     gl.Viewport(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)
-    gl.Enable(gl.DEPTH_TEST); 
-    gl.Enable(gl.CULL_FACE);
+    gl.Enable(gl.DEPTH_TEST)
+    gl.Enable(gl.CULL_FACE)
     gl.Enable(gl.MULTISAMPLE)
     gl.CullFace(gl.BACK)
-    gl.FrontFace(gl.CW);  
+    gl.FrontFace(gl.CW)
 }
 
 
