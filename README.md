@@ -19,6 +19,7 @@ Each chunk has its own mesh and faces that the player can't see are culled. <br 
 Currently there's no dynamic chunkloading and you can't edit the terrain but I want to add those features later on. <br />
 
 # Perfomance
+The memory usage is around 64MB <br />
 I tested this on a Intel Core i5-7200U and it ran around 90 - 120 fps. <br />
 I still want to optimize this further so it can run on even lower end devices. 
 
