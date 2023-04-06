@@ -76,7 +76,7 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                             append(&chunk_mesh.data, face[i])
                         }     
                         
-                        chunk_mesh.vertices+=24   
+                        chunk_mesh.vertices+=18   
                     }
                     //back    
                     if chunk.world[x][y][z+1] == 0{
@@ -86,7 +86,7 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                             append(&chunk_mesh.data, face[i])
                         }     
                         
-                        chunk_mesh.vertices+=24   
+                        chunk_mesh.vertices+=18   
                     }
                     //left
                     if chunk.world[x-1][y][z] == 0{
@@ -96,7 +96,7 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                             append(&chunk_mesh.data, face[i])
                         }     
                         
-                        chunk_mesh.vertices+=24   
+                        chunk_mesh.vertices+=18   
                     }
                     //right    
                     if chunk.world[x+1][y][z] == 0{
@@ -106,7 +106,7 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                             append(&chunk_mesh.data, face[i])
                         }     
                         
-                        chunk_mesh.vertices+=24   
+                        chunk_mesh.vertices+=18   
                     }
                     if chunk.world[x][y+1][z] == 0{
                         face = create_face_mesh(x,y,z, blocks[chunk.world[x][y][z]], 4)
@@ -115,7 +115,7 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                             append(&chunk_mesh.data, face[i])
                         }     
                         
-                        chunk_mesh.vertices+=24   
+                        chunk_mesh.vertices+=18   
                     }
                     if chunk.world[x][y-1][z] == 0 && y != 1{
                         face = create_face_mesh(x,y,z, blocks[chunk.world[x][y][z]], 5)
@@ -124,7 +124,7 @@ create_chunk_mesh :: proc(chunk :^Chunk, chunk_mesh : ^Mesh){
                             append(&chunk_mesh.data, face[i])
                         }     
                         
-                        chunk_mesh.vertices+=24   
+                        chunk_mesh.vertices+=18   
                     }
             }
             }
