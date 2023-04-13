@@ -3,7 +3,7 @@ package main
 
 main :: proc() {
     //Initialze game
-    init()
-    game_loop()
-    close()
+    raylib_init()
+    raylib_gameloop()
+    raylib_close()
 }

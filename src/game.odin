@@ -3,6 +3,7 @@ package main
 import c "core:c/libc"
 import "core:fmt"
 import glm "core:math/linalg/glsl"
+import rl "vendor:raylib"
 import gl "vendor:OpenGL"
 import stbi "vendor:stb/image"
 import "vendor:glfw"
@@ -66,7 +67,7 @@ init :: proc(){
     }
 
 
-    perspective = glm.mat4Perspective(camera.fov,f32(SCREEN_WIDTH)/f32(SCREEN_HEIGHT), 0.1, 1000.0)
+    //perspective = glm.mat4Perspective(camera.fov,f32(SCREEN_WIDTH)/f32(SCREEN_HEIGHT), 0.1, 1000.0)
 }
 
 //Inits glfw and glfw window. 
@@ -126,8 +127,8 @@ game_loop :: proc(){
 update :: proc(delta_time :f64){
     using glm 
 
-    view = mat4LookAt(camera.position, camera.position + camera.target, camera.up) 
-    camera_update_first_person(&camera, window, delta_time)
+    //view = mat4LookAt(camera.position, camera.position + camera.target, camera.up) 
+    camera_update_first_person(&camera, f32(delta_time))
     //fmt.println(camera.position/CHUNK_SIZE)
 }
 
@@ -163,14 +164,38 @@ close :: proc(){
 
 
 
+raylib_init :: proc(){
+    rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window")
+    rl.HideCursor()
+    rl.DisableCursor()
+    camera_init(&camera)
+}
 
+raylib_gameloop :: proc(){
+    for !rl.WindowShouldClose(){
+        camera_update_first_person(&camera, rl.GetFrameTime())
+        rl.UpdateCameraPro(&camera.base, camera.movement, camera.rotation, camera.zoom)
+        
+        
+        rl.ClearBackground(rl.RAYWHITE)
 
+        rl.BeginMode3D(camera.base)
+            rl.DrawGrid(10, 1)
+            rl.DrawCube(rl.Vector3{0,0,0}, 1,1,1,rl.RED)
+        rl.EndMode3D()
 
+        rl.BeginDrawing()
+            rl.DrawFPS(10,10)
+        rl.EndDrawing()
+    }
+}
 
-
+raylib_close :: proc(){
+    rl.CloseWindow()
+}
 
 
 
 mouse_callback :: proc "c" (window : glfw.WindowHandle, xpos_in : f64, ypos_in : f64){
-    camera_mouse_callback_first_person(&camera, &mouse_input, xpos_in, ypos_in)   
+
 }
