@@ -161,14 +161,30 @@ close :: proc(){
     glfw.Terminate()
 }
 
+mesh := [9]f32{
+    0,0,0,
+    0,1,0,
+    1,1,0,
+}
 
 
+vao :u32
+vbo :u32
+shader :rl.Shader
 
 raylib_init :: proc(){
     rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window")
     rl.HideCursor()
     rl.DisableCursor()
     camera_init(&camera)
+    shader.locs = rl.rlGetShaderLocsDefault()
+    shader.id = rl.rlGetShaderIdDefault()
+
+    fmt.println(shader.locs[rl.ShaderLocationIndex.MATRIX_VIEW])
+    fmt.println(shader.locs[rl.ShaderLocationIndex.MATRIX_PROJECTION])
+    vao = rl.rlLoadVertexArray()
+    rl.rlEnableVertexArray(vao)
+    vbo = rl.rlLoadVertexBuffer(&mesh, size_of(mesh[0])*len(mesh), false)
 }
 
 raylib_gameloop :: proc(){
@@ -177,11 +193,25 @@ raylib_gameloop :: proc(){
         rl.UpdateCameraPro(&camera.base, camera.movement, camera.rotation, camera.zoom)
         
         
-        rl.ClearBackground(rl.RAYWHITE)
+        rl.ClearBackground(rl.GRAY)
 
         rl.BeginMode3D(camera.base)
             rl.DrawGrid(10, 1)
-            rl.DrawCube(rl.Vector3{0,0,0}, 1,1,1,rl.RED)
+            rl.DrawCube(rl.Vector3{0,0,3}, 1,1,1,rl.RED)
+            rl.rlDrawRenderBatchActive()
+
+            rl.rlEnableShader(shader.id)
+                
+                rl.rlSetUniformMatrix(shader.locs[rl.ShaderLocationIndex.MATRIX_VIEW], rl.rlGetMatrixModelview())
+                rl.rlSetUniformMatrix(shader.locs[rl.ShaderLocationIndex.MATRIX_PROJECTION], rl.rlGetMatrixProjection())
+                rl.rlSetUniformMatrix(shader.locs[rl.ShaderLocationIndex.MATRIX_VIEW], glm.identity(glm.mat4))
+                
+                rl.rlEnableVertexArray(vao)
+                rl.rlDrawVertexArray(0,3)
+            rl.rlDisableShader()
+
+
+
         rl.EndMode3D()
 
         rl.BeginDrawing()
@@ -191,6 +221,7 @@ raylib_gameloop :: proc(){
 }
 
 raylib_close :: proc(){
+    rl.UnloadShader(shader)
     rl.CloseWindow()
 }
 
